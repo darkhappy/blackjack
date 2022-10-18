@@ -1,5 +1,6 @@
 package com.example.blackjack
 
-class Card {
-
-}
+data class Card (
+    val rank: String,
+    val suit: String,
+)
