@@ -17,14 +17,13 @@ class MainViewModel : ViewModel() {
         playerHand.value = mutableListOf<Card>()
     }
 
-    val getDeck = liveData(Dispatchers.IO) {
+    fun getDeck() = liveData(Dispatchers.IO) {
         val response = repository.getDeck()
-        deckID = response.deckId
         emit(response)
     }
 
-    val getCard = liveData(Dispatchers.IO) {
-        val response = repository.getCard(258)
+    fun getCard() = liveData(Dispatchers.IO) {
+        val response = repository.getCard(deckID)
         emit(response)
     }
 

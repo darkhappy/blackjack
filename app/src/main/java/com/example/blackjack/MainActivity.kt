@@ -1,10 +1,14 @@
 package com.example.blackjack
 
 import android.os.Bundle
+import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.example.blackjack.databinding.ActivityMainBinding
+import org.w3c.dom.Text
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
     private lateinit var viewModel: MainViewModel
@@ -23,11 +27,13 @@ class MainActivity : AppCompatActivity() {
         val list = binding.layout
 
         deckbutton.setOnClickListener {
-            viewModel.getDeck.observe(this) {}
+            viewModel.getDeck().observe(this) { deck->
+                viewModel.deckID = deck.deckId
+            }
         }
 
         hitme.setOnClickListener {
-            viewModel.getCard.observe(this) { card ->
+            viewModel.getCard().observe(this) { card ->
                 viewModel.addCardToPlayerHand(card)
             }
         }
@@ -35,10 +41,22 @@ class MainActivity : AppCompatActivity() {
         viewModel.getPlayerHand().observe(this) { hand ->
             list.removeAllViews()
             for (card in hand) {
-                val cardView = TextView(this)
-                cardView.text = card.toString()
-                list.addView(cardView)
+                list.addView(displayCard(card))
             }
         }
+    }
+
+    fun displayCard(card: Card) : ImageView {
+        val image = ImageView(this)
+
+        // Find the image in the drawable folder
+        // The card has the suit and value, so we need to convert it to the correct image name
+        val imageName = card.suit.lowercase() + "_" + card.rank.lowercase()
+        val id = resources.getIdentifier(imageName, "drawable", packageName)
+        image.setImageResource(id)
+        image.layoutParams = ViewGroup.LayoutParams(200, 300)
+
+
+        return image
     }
 }
