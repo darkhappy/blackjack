@@ -51,18 +51,16 @@ class MainActivity : AppCompatActivity() {
 
         viewModel.getCard().observe(this) { card ->
             viewModel.addCardToPlayerHand(card)
-        }
-
-        viewModel.getCard().observe(this) { card ->
-            viewModel.addCardToDealerHand(card)
-        }
-
-        viewModel.getCard().observe(this) { card ->
-            viewModel.addCardToPlayerHand(card)
-        }
-
-        viewModel.getCard().observe(this) { card ->
-            viewModel.addCardToDealerHand(card)
+            viewModel.getCard().observe(this@MainActivity) { dealerCard ->
+                dealerCard.hidden = true
+                viewModel.addCardToDealerHand(dealerCard)
+                viewModel.getCard().observe(this@MainActivity) { card2 ->
+                    viewModel.addCardToPlayerHand(card2)
+                    viewModel.getCard().observe(this@MainActivity) { dealerCard2 ->
+                        viewModel.addCardToDealerHand(dealerCard2)
+                    }
+                }
+            }
         }
     }
 
@@ -71,9 +69,14 @@ class MainActivity : AppCompatActivity() {
 
         // Find the image in the drawable folder
         // The card has the suit and value, so we need to convert it to the correct image name
-        val imageName = card.suit.lowercase() + "_" + card.rank.lowercase()
-        val id = resources.getIdentifier(imageName, "drawable", packageName)
-        image.setImageResource(id)
+        if (card.hidden) {
+            image.setImageResource(R.drawable.card_back)
+        } else {
+            val imageName = card.suit.lowercase() + "_" + card.rank.lowercase()
+            val id = resources.getIdentifier(imageName, "drawable", packageName)
+            image.setImageResource(id)
+        }
+
         image.layoutParams = ViewGroup.LayoutParams(200, 300)
 
         return image
