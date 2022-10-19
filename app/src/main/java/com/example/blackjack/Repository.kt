@@ -1,10 +1,9 @@
 package com.example.blackjack
 
 class Repository {
-    var deckClient: DeckAPI = RetrofitClient.initDeck()
-    var cardClient: CardAPI = RetrofitClient.initCard()
+    private var client: DeckAPI = RetrofitClient.init()
 
-    suspend fun getDeck(): Deck = deckClient.getDeck()
+    suspend fun getDeck(): Deck = client.getDeck()
 
-    suspend fun getCard(deckId: Int): Card = cardClient.getCard(deckId)
+    suspend fun getCard(deckId: Int): Card = client.getCard(deckId)
 }

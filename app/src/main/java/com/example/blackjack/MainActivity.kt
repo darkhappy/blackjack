@@ -3,12 +3,9 @@ package com.example.blackjack
 import android.os.Bundle
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.example.blackjack.databinding.ActivityMainBinding
-import org.w3c.dom.Text
-import java.util.*
 
 class MainActivity : AppCompatActivity() {
     private lateinit var viewModel: MainViewModel
@@ -23,14 +20,8 @@ class MainActivity : AppCompatActivity() {
         viewModel = ViewModelProvider(this)[MainViewModel::class.java]
 
         val hitme = binding.hitme
-        val deckbutton = binding.deck
-        val list = binding.layout
-
-        hitme.setOnClickListener {
-            viewModel.getCard().observe(this) { card ->
-                viewModel.addCardToPlayerHand(card)
-            }
-        }
+        val list = binding.player
+        val dealer = binding.dealer
 
         viewModel.getPlayerHand().observe(this) { hand ->
             list.removeAllViews()
@@ -38,9 +29,44 @@ class MainActivity : AppCompatActivity() {
                 list.addView(displayCard(card))
             }
         }
+
+        viewModel.getDealerHand().observe(this) { hand ->
+            dealer.removeAllViews()
+            for (card in hand) {
+                dealer.addView(displayCard(card))
+            }
+        }
+
+        startGame()
+
+        hitme.setOnClickListener {
+            viewModel.getCard().observe(this) { card ->
+                viewModel.addCardToPlayerHand(card)
+            }
+        }
     }
 
-    fun displayCard(card: Card) : ImageView {
+    fun startGame() {
+        viewModel.resetHands()
+
+        viewModel.getCard().observe(this) { card ->
+            viewModel.addCardToPlayerHand(card)
+        }
+
+        viewModel.getCard().observe(this) { card ->
+            viewModel.addCardToDealerHand(card)
+        }
+
+        viewModel.getCard().observe(this) { card ->
+            viewModel.addCardToPlayerHand(card)
+        }
+
+        viewModel.getCard().observe(this) { card ->
+            viewModel.addCardToDealerHand(card)
+        }
+    }
+
+    fun displayCard(card: Card): ImageView {
         val image = ImageView(this)
 
         // Find the image in the drawable folder
@@ -49,7 +75,6 @@ class MainActivity : AppCompatActivity() {
         val id = resources.getIdentifier(imageName, "drawable", packageName)
         image.setImageResource(id)
         image.layoutParams = ViewGroup.LayoutParams(200, 300)
-
 
         return image
     }
