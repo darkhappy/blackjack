@@ -26,12 +26,6 @@ class MainActivity : AppCompatActivity() {
         val deckbutton = binding.deck
         val list = binding.layout
 
-        deckbutton.setOnClickListener {
-            viewModel.getDeck().observe(this) { deck->
-                viewModel.deckID = deck.deckId
-            }
-        }
-
         hitme.setOnClickListener {
             viewModel.getCard().observe(this) { card ->
                 viewModel.addCardToPlayerHand(card)

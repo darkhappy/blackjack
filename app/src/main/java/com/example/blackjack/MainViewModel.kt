@@ -8,21 +8,21 @@ import kotlinx.coroutines.Dispatchers
 
 class MainViewModel : ViewModel() {
     private val repository: Repository = Repository()
-    var deckID : Int = 258
+    private var deckID : Int = 0
 
-    private var playerHand : MutableLiveData<List<Card>> = MutableLiveData<List<Card>>()
-    private var dealerHand = mutableListOf<Card>()
+    private var playerHand = MutableLiveData<List<Card>>()
+    private var dealerHand = MutableLiveData<List<Card>>()
 
     init {
-        playerHand.value = mutableListOf<Card>()
-    }
-
-    fun getDeck() = liveData(Dispatchers.IO) {
-        val response = repository.getDeck()
-        emit(response)
+        playerHand.value = mutableListOf()
+        dealerHand.value = mutableListOf()
     }
 
     fun getCard() = liveData(Dispatchers.IO) {
+        if (deckID == 0) {
+            val response = repository.getDeck()
+            deckID = response.deckId
+        }
         val response = repository.getCard(deckID)
         emit(response)
     }
@@ -33,18 +33,20 @@ class MainViewModel : ViewModel() {
     }
 
     fun addCardToDealerHand(card: Card) {
-        dealerHand.add(card)
+        val newHand = dealerHand.value?.toList()?.plus(card)!!
+        dealerHand.value = newHand
     }
 
     fun getPlayerHand() : LiveData<List<Card>> {
         return playerHand
     }
 
-    fun getDealerHand() : MutableList<Card> {
+    fun getDealerHand() : LiveData<List<Card>> {
         return dealerHand
     }
 
     fun resetHands() {
-        dealerHand.clear()
+        playerHand.value = mutableListOf()
+        dealerHand.value = mutableListOf()
     }
 }
