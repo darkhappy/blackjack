@@ -9,17 +9,19 @@ import com.example.blackjack.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
     private lateinit var viewModel: MainViewModel
+    private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        val binding = ActivityMainBinding.inflate(layoutInflater)
+        binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
 
         viewModel = ViewModelProvider(this)[MainViewModel::class.java]
 
         val hitme = binding.hitme
+        val stand = binding.stand
         val list = binding.player
         val dealer = binding.dealer
 
@@ -28,6 +30,7 @@ class MainActivity : AppCompatActivity() {
             for (card in hand) {
                 list.addView(displayCard(card))
             }
+            binding.playerScore.text = viewModel.getPlayerHandValue().toString()
         }
 
         viewModel.getDealerHand().observe(this) { hand ->
@@ -35,15 +38,43 @@ class MainActivity : AppCompatActivity() {
             for (card in hand) {
                 dealer.addView(displayCard(card))
             }
+            if (hand.isNotEmpty() && !hand.first().hidden) {
+                binding.dealerScore.text = viewModel.getDealerHandValue().toString()
+            }
         }
 
         startGame()
 
         hitme.setOnClickListener {
+            handleHit()
+        }
+
+        stand.setOnClickListener {
+            handleStand()
+        }
+    }
+
+    fun handleHit() {
+        if (viewModel.getPlayerHandValue() < 22) {
             viewModel.getCard().observe(this) { card ->
                 viewModel.addCardToPlayerHand(card)
+                if (viewModel.getPlayerHandValue() > 21) {
+                    // TODO: Bust
+                }
             }
         }
+    }
+
+    fun handleStand() {
+        viewModel.showDealerHand()
+        if (viewModel.getDealerHandValue() < 17) {
+            viewModel.getCard().observe(this) { card ->
+                viewModel.addCardToDealerHand(card)
+                handleStand()
+            }
+        }
+
+        // TODO: Handle win/loss
     }
 
     fun startGame() {

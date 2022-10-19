@@ -45,8 +45,42 @@ class MainViewModel : ViewModel() {
         return dealerHand
     }
 
+    fun getPlayerHandValue() : Int {
+        return getHandValue(playerHand.value!!)
+    }
+
+    fun getDealerHandValue() : Int {
+        return getHandValue(dealerHand.value!!)
+    }
+
+    private fun getHandValue(hand: List<Card>) : Int {
+        var value = 0
+        hand.forEach { card ->
+            value += when (card.rank) {
+                "As" -> 11
+                "Roi", "Reine", "Valet" -> 10
+                else -> card.rank.toInt()
+            }
+        }
+
+        hand.forEach { card ->
+            if (card.rank == "As" && value > 21) {
+                value -= 10
+            }
+        }
+
+        return value
+    }
+
     fun resetHands() {
         playerHand.value = mutableListOf()
         dealerHand.value = mutableListOf()
+    }
+
+    fun showDealerHand() {
+        // first card is hidden so we need to show it
+        val newHand = dealerHand.value?.toMutableList()
+        newHand?.set(0, newHand[0].copy(hidden = false))
+        dealerHand.value = newHand!!
     }
 }
