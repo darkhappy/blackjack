@@ -3,6 +3,7 @@ package com.example.blackjack
 import android.os.Bundle
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
@@ -10,6 +11,7 @@ import com.example.blackjack.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
     private lateinit var viewModel: MainViewModel
+    private lateinit var statsViewModel: StatsViewModel
     private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,9 +22,11 @@ class MainActivity : AppCompatActivity() {
         setContentView(view)
 
         viewModel = ViewModelProvider(this)[MainViewModel::class.java]
+        statsViewModel = ViewModelProvider(this)[StatsViewModel::class.java]
 
         val list = binding.player
         val dealer = binding.dealer
+        val statsList = binding.stats
 
         val hitme = binding.hitme
         val stand = binding.stand
@@ -53,7 +57,21 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        startGame()
+        statsViewModel.getAll().observe(this) { stats ->
+            statsList.removeAllViews()
+            val total = stats.sumOf(CardStat::count).toDouble()
+            for (stat in stats) {
+                var textView = TextView(this)
+                textView.text = "${stat.card} - ${stat.count} - ${String.format("%.2f", stat.count / total * 100)}%"
+                statsList.addView(textView)
+            }
+        }
+
+
+        viewModel.getDeck().observe(this) { deck ->
+            statsViewModel.initialise()
+            startGame()
+        }
 
         hitme.setOnClickListener {
             handleHit()
@@ -78,14 +96,13 @@ class MainActivity : AppCompatActivity() {
         stand.isEnabled = false
 
 
-        if (viewModel.getPlayerHandValue() < 22) {
-            viewModel.getCard().observe(this) { card ->
-                viewModel.addCardToPlayerHand(card)
-                hitme.isEnabled = true
-                stand.isEnabled = true
-                if (viewModel.getPlayerHandValue() > 21) {
-                    handleBust()
-                }
+        viewModel.getCard().observe(this) { card ->
+            viewModel.addCardToPlayerHand(card)
+            statsViewModel.decrease(card)
+            hitme.isEnabled = true
+            stand.isEnabled = true
+            if (viewModel.getPlayerHandValue() > 21) {
+                handleBust()
             }
         }
     }
@@ -114,6 +131,7 @@ class MainActivity : AppCompatActivity() {
         if (viewModel.getDealerHandValue() < 17) {
             viewModel.getCard().observe(this) { card ->
                 viewModel.addCardToDealerHand(card)
+                statsViewModel.decrease(card)
                 handleStand()
             }
         } else if (viewModel.getDealerHandValue() > 21) {
@@ -136,15 +154,20 @@ class MainActivity : AppCompatActivity() {
     fun startGame() {
         viewModel.resetHands()
 
+        // Initialize the game
         viewModel.getCard().observe(this) { card ->
             viewModel.addCardToPlayerHand(card)
+            statsViewModel.decrease(card)
             viewModel.getCard().observe(this@MainActivity) { dealerCard ->
                 dealerCard.hidden = true
                 viewModel.addCardToDealerHand(dealerCard)
+                statsViewModel.decrease(dealerCard)
                 viewModel.getCard().observe(this@MainActivity) { card2 ->
                     viewModel.addCardToPlayerHand(card2)
+                    statsViewModel.decrease(card2)
                     viewModel.getCard().observe(this@MainActivity) { dealerCard2 ->
                         viewModel.addCardToDealerHand(dealerCard2)
+                        statsViewModel.decrease(dealerCard2)
 
                         val playerScore = viewModel.getPlayerHandValue()
                         val dealerScore = viewModel.getDealerHandValue()

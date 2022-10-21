@@ -12,14 +12,13 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:text="@string/app_name"
+        android:textSize="30sp"
         app:layout_constraintBottom_toTopOf="@id/hitme"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.157"
-        android:textSize="30sp"
-        />
+        app:layout_constraintVertical_bias="0.157" />
 
     <Button
         android:id="@+id/hitme"
@@ -55,14 +54,31 @@
         app:layout_constraintStart_toEndOf="@+id/hitme"
         app:layout_constraintTop_toBottomOf="@id/textView" />
 
+    <ScrollView
+        android:id="@+id/stats_scroll"
+        android:layout_width="120dp"
+        android:layout_height="0dp"
+        android:layout_margin="32dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/hitme"
+        app:layout_constraintBottom_toBottomOf="parent"
+
+        >
+        <LinearLayout
+            android:id="@+id/stats"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+    </ScrollView>
+
+
     <HorizontalScrollView
         android:id="@+id/player_scroll"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="32dp"
-        android:layout_marginBottom="32dp"
+        android:layout_margin="32dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/stats_scroll"
         app:layout_constraintStart_toEndOf="@+id/playerScore"
         app:layout_constraintTop_toBottomOf="@id/dealer_scroll">
 
@@ -77,10 +93,9 @@
         android:id="@+id/dealer_scroll"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="32dp"
-        android:layout_marginBottom="32dp"
+        android:layout_margin="32dp"
         app:layout_constraintBottom_toTopOf="@+id/player_scroll"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/stats_scroll"
         app:layout_constraintStart_toEndOf="@+id/dealerScore"
         app:layout_constraintTop_toBottomOf="@+id/hitme">
 
@@ -114,7 +129,6 @@
         app:layout_constraintEnd_toStartOf="@+id/player_scroll"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/player_scroll" />
-
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

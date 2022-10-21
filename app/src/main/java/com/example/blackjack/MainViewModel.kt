@@ -1,9 +1,6 @@
 package com.example.blackjack
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.liveData
+import androidx.lifecycle.*
 import kotlinx.coroutines.Dispatchers
 
 class MainViewModel : ViewModel() {
@@ -82,5 +79,10 @@ class MainViewModel : ViewModel() {
         val newHand = dealerHand.value?.toMutableList()
         newHand?.set(0, newHand[0].copy(hidden = false))
         dealerHand.value = newHand!!
+    }
+
+    fun getDeck() = liveData(Dispatchers.IO) {
+        val response = repository.getDeck()
+        emit(response)
     }
 }
