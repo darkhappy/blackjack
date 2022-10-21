@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity() {
             for (card in hand) {
                 list.addView(displayCard(card))
             }
-            playerScore.text = viewModel.getPlayerHandValue().toString()
+            playerScore.text = "Player: ${viewModel.getPlayerHandValue()}"
         }
 
         viewModel.getDealerHand().observe(this) { hand ->
@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity() {
                 dealer.addView(displayCard(card))
             }
             if (hand.isNotEmpty() && !hand.first().hidden) {
-                dealerScore.text = viewModel.getDealerHandValue().toString()
+                dealerScore.text = "Dealer: ${viewModel.getDealerHandValue()}"
             }
         }
 
@@ -65,8 +65,8 @@ class MainActivity : AppCompatActivity() {
 
         reset.setOnClickListener {
             startGame()
-            playerScore.text = "0"
-            dealerScore.text = "0"
+            playerScore.text = "Player: 0"
+            dealerScore.text = "Player: 0"
         }
     }
 
@@ -182,8 +182,8 @@ class MainActivity : AppCompatActivity() {
     fun endGame() {
         val playerScore = binding.playerScore
         val dealerScore = binding.dealerScore
-        playerScore.text = viewModel.getPlayerHandValue().toString()
-        dealerScore.text = viewModel.getDealerHandValue().toString()
+        playerScore.text = "Player: ${viewModel.getPlayerHandValue()}"
+        dealerScore.text = "Dealer: ${viewModel.getDealerHandValue()}"
 
         val hitme = binding.hitme
         val stand = binding.stand

@@ -9,15 +9,17 @@
     <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
-        android:layout_height="19dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:text="@string/app_name"
-        app:layout_constraintBottom_toBottomOf="@id/hitme"
+        app:layout_constraintBottom_toTopOf="@id/hitme"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.157" />
+        app:layout_constraintVertical_bias="0.157"
+        android:textSize="30sp"
+        />
 
     <Button
         android:id="@+id/hitme"
@@ -25,9 +27,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:layout_marginTop="32dp"
-        android:layout_marginEnd="96dp"
         android:text="hit me"
-        app:layout_constraintEnd_toStartOf="@+id/stand"
+        app:layout_constraintEnd_toStartOf="@+id/reset"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/textView" />
 
@@ -48,9 +49,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
-        android:layout_marginEnd="32dp"
         android:text="reset"
-        app:layout_constraintEnd_toEndOf="@+id/stand"
+        app:layout_constraintEnd_toStartOf="@+id/stand"
         app:layout_constraintHorizontal_bias="0.888"
         app:layout_constraintStart_toEndOf="@+id/hitme"
         app:layout_constraintTop_toBottomOf="@id/textView" />
@@ -95,24 +95,26 @@
 
     <TextView
         android:id="@+id/dealerScore"
-        android:layout_width="44dp"
+        android:layout_width="wrap_content"
         android:layout_height="19dp"
         android:layout_marginStart="32dp"
         android:layout_marginEnd="32dp"
-        android:text="Dealer:"
+        android:text="Dealer: 0"
         app:layout_constraintEnd_toStartOf="@+id/dealer_scroll"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/dealer_scroll" />
 
     <TextView
         android:id="@+id/playerScore"
-        android:layout_width="44dp"
+        android:layout_width="wrap_content"
         android:layout_height="19dp"
         android:layout_marginStart="32dp"
         android:layout_marginEnd="32dp"
-        android:text="Player::"
+        android:text="Player: 0"
         app:layout_constraintEnd_toStartOf="@+id/player_scroll"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/player_scroll" />
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
