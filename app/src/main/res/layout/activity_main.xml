@@ -27,7 +27,7 @@
         android:layout_marginStart="32dp"
         android:layout_marginTop="32dp"
         android:text="hit me"
-        app:layout_constraintEnd_toStartOf="@+id/reset"
+        app:layout_constraintEnd_toStartOf="@+id/split"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/textView" />
 
@@ -51,8 +51,20 @@
         android:text="reset"
         app:layout_constraintEnd_toStartOf="@+id/stand"
         app:layout_constraintHorizontal_bias="0.888"
+        app:layout_constraintStart_toEndOf="@+id/split"
+        app:layout_constraintTop_toBottomOf="@id/textView" />
+
+    <Button
+        android:id="@+id/split"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="split"
+        app:layout_constraintEnd_toStartOf="@+id/reset"
+        app:layout_constraintHorizontal_bias="0.888"
         app:layout_constraintStart_toEndOf="@+id/hitme"
         app:layout_constraintTop_toBottomOf="@id/textView" />
+
 
     <ScrollView
         android:id="@+id/stats_scroll"
@@ -78,7 +90,7 @@
         android:layout_height="0dp"
         android:layout_margin="32dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/stats_scroll"
+        app:layout_constraintEnd_toStartOf="@id/split_scroll"
         app:layout_constraintStart_toEndOf="@+id/playerScore"
         app:layout_constraintTop_toBottomOf="@id/dealer_scroll">
 
@@ -86,7 +98,7 @@
             android:id="@+id/player"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:orientation="horizontal"></LinearLayout>
+            android:orientation="horizontal" />
     </HorizontalScrollView>
 
     <HorizontalScrollView
@@ -108,6 +120,24 @@
         </LinearLayout>
     </HorizontalScrollView>
 
+    <HorizontalScrollView
+        android:id="@+id/split_scroll"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="32dp"
+        android:layout_marginBottom="32dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/stats_scroll"
+        app:layout_constraintStart_toEndOf="@+id/player_scroll"
+        app:layout_constraintTop_toTopOf="@+id/player_scroll">
+
+        <LinearLayout
+            android:id="@+id/splitHand"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal" />
+    </HorizontalScrollView>
+
     <TextView
         android:id="@+id/dealerScore"
         android:layout_width="wrap_content"
@@ -126,9 +156,18 @@
         android:layout_marginStart="32dp"
         android:layout_marginEnd="32dp"
         android:text="Player: 0"
-        app:layout_constraintEnd_toStartOf="@+id/player_scroll"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/player_scroll" />
+
+
+    <TextView
+        android:id="@+id/splitScore"
+        android:layout_width="wrap_content"
+        android:layout_height="19dp"
+        android:layout_marginStart="32dp"
+        android:text="Split: 0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/playerScore" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
