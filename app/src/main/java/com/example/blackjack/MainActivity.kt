@@ -164,6 +164,7 @@ class MainActivity : AppCompatActivity() {
         // Check if player has split hand
         if (viewModel.isSplitHandActive()) {
             viewModel.switchToPlayerHand()
+            Toast.makeText(this, "Switching to player hand", Toast.LENGTH_SHORT).show()
             hitme.isEnabled = true
             stand.isEnabled = true
             return
