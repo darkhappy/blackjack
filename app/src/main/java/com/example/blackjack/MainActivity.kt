@@ -67,11 +67,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-
-        viewModel.getDeck().observe(this) { deck ->
-            statsViewModel.initialise()
-            startGame()
-        }
+        viewModel.getDeck().observe(this) {}
 
         hitme.setOnClickListener {
             handleHit()
@@ -82,10 +78,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         reset.setOnClickListener {
-            startGame()
+            askBet()
             playerScore.text = "Player: 0"
             dealerScore.text = "Player: 0"
         }
+
+        askBet()
     }
 
     fun handleHit() {
@@ -114,8 +112,10 @@ class MainActivity : AppCompatActivity() {
         if (playerScore > 21) {
             Toast.makeText(this, "Player busts!", Toast.LENGTH_SHORT).show()
             viewModel.showDealerHand()
+            viewModel.lose()
         } else if (dealerScore > 21) {
             Toast.makeText(this, "Dealer busts!", Toast.LENGTH_SHORT).show()
+            viewModel.win()
         }
 
         endGame()
@@ -141,13 +141,31 @@ class MainActivity : AppCompatActivity() {
             val dealerScore = viewModel.getDealerHandValue()
             if (playerScore > dealerScore) {
                 Toast.makeText(this, "Player wins!", Toast.LENGTH_SHORT).show()
+                viewModel.win()
             } else if (playerScore < dealerScore) {
                 Toast.makeText(this, "Dealer wins!", Toast.LENGTH_SHORT).show()
+                viewModel.lose()
             } else {
                 Toast.makeText(this, "It's a tie!", Toast.LENGTH_SHORT).show()
             }
 
             endGame()
+        }
+    }
+
+    fun askBet() {
+        val dialog = BetDialog.newInstance();
+        dialog.show(supportFragmentManager, "BetDialog")
+    }
+
+    fun onBet(bet: Int) {
+        val playerMoney = viewModel.getMoney()
+        if (playerMoney < bet) {
+            Toast.makeText(this, "You don't have enough money!", Toast.LENGTH_SHORT).show()
+            askBet()
+        } else {
+            viewModel.setBet(bet)
+            startGame()
         }
     }
 
@@ -194,8 +212,10 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "It's a tie!", Toast.LENGTH_SHORT).show()
         } else if (player == 21) {
             Toast.makeText(this, "Player blackjack!", Toast.LENGTH_SHORT).show()
+            viewModel.win()
         } else {
             Toast.makeText(this, "Dealer blackjack!", Toast.LENGTH_SHORT).show()
+            viewModel.lose()
         }
 
         viewModel.showDealerHand()
@@ -218,8 +238,6 @@ class MainActivity : AppCompatActivity() {
     fun displayCard(card: Card): ImageView {
         val image = ImageView(this)
 
-        // Find the image in the drawable folder
-        // The card has the suit and value, so we need to convert it to the correct image name
         if (card.hidden) {
             image.setImageResource(R.drawable.card_back)
         } else {
