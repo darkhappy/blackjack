@@ -62,7 +62,12 @@ class MainActivity : AppCompatActivity() {
             val total = stats.sumOf(CardStat::count).toDouble()
             for (stat in stats) {
                 var textView = TextView(this)
-                textView.text = "${stat.card} - ${stat.count} - ${String.format("%.2f", stat.count / total * 100)}%"
+                textView.text = "${stat.card} - ${stat.count} - ${
+                    String.format(
+                        "%.2f",
+                        stat.count / total * 100
+                    )
+                }%"
                 statsList.addView(textView)
             }
         }
@@ -159,13 +164,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onBet(bet: Int) {
-        val playerMoney = viewModel.getMoney()
-        if (playerMoney < bet) {
-            Toast.makeText(this, "You don't have enough money!", Toast.LENGTH_SHORT).show()
-            askBet()
-        } else {
-            viewModel.setBet(bet)
-            startGame()
+        val playerMoney = viewModel.getMoney().value
+        if (bet == 0) {
+            Toast.makeText(this, "You must bet something!", Toast.LENGTH_SHORT).show()
+        } else if (playerMoney != null) {
+            if (playerMoney < bet) {
+                Toast.makeText(this, "You don't have enough money!", Toast.LENGTH_SHORT).show()
+                askBet()
+            } else {
+                viewModel.setBet(bet)
+                startGame()
+            }
         }
     }
 

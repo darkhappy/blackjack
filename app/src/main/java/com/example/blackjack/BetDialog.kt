@@ -1,32 +1,35 @@
 package com.example.blackjack
 
-import android.app.Dialog
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
-import org.w3c.dom.Text
+import androidx.fragment.app.activityViewModels
 
 class BetDialog : DialogFragment() {
-
-    val money = 1000
+    private val viewModel : MainViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_bet_dialog, container, false)
+
         view.findViewById<View>(R.id.bet_dialog_button).setOnClickListener {
             onBetClick(view)
         }
-        // show the money the player has
-        view.findViewById<TextView>(R.id.bet_dialog_balance).text = "Balance: $money"
-
         return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        viewModel.getMoney().observe(this) {
+            view.findViewById<TextView>(R.id.bet_dialog_balance).text = "Balance: $it"
+        }
     }
 
     companion object {

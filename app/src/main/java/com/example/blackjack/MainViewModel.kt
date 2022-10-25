@@ -10,10 +10,11 @@ class MainViewModel : ViewModel() {
     private var playerHand = MutableLiveData<List<Card>>()
     private var dealerHand = MutableLiveData<List<Card>>()
 
-    private var money : Int = 1000
+    private var money = MutableLiveData<Int>()
     private var bet : Int = 0
 
     init {
+        money.value = 100
         playerHand.value = mutableListOf()
         dealerHand.value = mutableListOf()
     }
@@ -89,7 +90,7 @@ class MainViewModel : ViewModel() {
         emit(response)
     }
 
-    fun getMoney() : Int {
+    fun getMoney() : LiveData<Int> {
         return money
     }
 
@@ -98,11 +99,11 @@ class MainViewModel : ViewModel() {
     }
 
     fun win() {
-        money += bet
+        money.value = money.value?.plus(bet)
     }
 
     fun lose() {
-        money -= bet
+        money.value = money.value?.minus(bet)
     }
 
     fun resetBet() {
