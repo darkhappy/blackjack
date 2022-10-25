@@ -24,43 +24,48 @@ class MainActivity : AppCompatActivity() {
         viewModel = ViewModelProvider(this)[MainViewModel::class.java]
         statsViewModel = ViewModelProvider(this)[StatsViewModel::class.java]
 
-        val list = binding.player
-        val dealer = binding.dealer
+        // Lists
+        val playerHand = binding.player
+        val dealerHand = binding.dealer
         val splitHand = binding.splitHand
         val statsList = binding.stats
 
+        // Buttons
         val hitme = binding.hitme
         val stand = binding.stand
         val split = binding.split
+        val reset = binding.reset
 
         hitme.isEnabled = false
         stand.isEnabled = false
         split.isEnabled = false
 
-        val reset = binding.reset
-
+        // Scores
         val playerScore = binding.playerScore
         val dealerScore = binding.dealerScore
         val splitScore = binding.splitScore
 
+        // Show the cards of the player
         viewModel.getPlayerHand().observe(this) { hand ->
-            list.removeAllViews()
+            playerHand.removeAllViews()
             for (card in hand) {
-                list.addView(displayCard(card))
+                playerHand.addView(displayCard(card))
             }
             playerScore.text = "Player: ${viewModel.getPlayerHandValue()}"
         }
 
+        // Show the cards of the dealer
         viewModel.getDealerHand().observe(this) { hand ->
-            dealer.removeAllViews()
+            dealerHand.removeAllViews()
             for (card in hand) {
-                dealer.addView(displayCard(card))
+                dealerHand.addView(displayCard(card))
             }
             if (hand.isNotEmpty() && !hand.first().hidden) {
                 dealerScore.text = "Dealer: ${viewModel.getDealerHandValue()}"
             }
         }
 
+        // Show the cards of the split
         viewModel.getSplitHand().observe(this) { hand ->
             splitHand.removeAllViews()
             for (card in hand) {
@@ -69,6 +74,7 @@ class MainActivity : AppCompatActivity() {
             splitScore.text = "Split: ${viewModel.getSplitHandValue()}"
         }
 
+        // Show the stats
         statsViewModel.getAll().observe(this) { stats ->
             statsList.removeAllViews()
             val total = stats.sumOf(CardStat::count).toDouble()
@@ -84,8 +90,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        viewModel.getDeck().observe(this) {}
-
+        // Button handlers
         hitme.setOnClickListener {
             handleHit()
         }
@@ -97,16 +102,23 @@ class MainActivity : AppCompatActivity() {
         reset.setOnClickListener {
             askBet()
             playerScore.text = "Player: 0"
-            dealerScore.text = "Player: 0"
+            dealerScore.text = "Dealer: 0"
+            splitScore.text = "Split: 0"
         }
 
         split.setOnClickListener {
             handleSplit()
         }
 
+        // Get a new deck
+        viewModel.getDeck().observe(this) {}
+        statsViewModel.initialise()
+
+        // Start the game
         askBet()
     }
 
+    // Handles a hit
     fun handleHit() {
         val hitme = binding.hitme
         val stand = binding.stand
@@ -123,7 +135,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // Handles a split
     fun handleSplit() {
+        // Make sure that the player has the money to split
         if (viewModel.getBet() * 2 > viewModel.getMoney().value!!) {
             Toast.makeText(this, "You don't have enough money to split", Toast.LENGTH_SHORT).show()
             binding.split.isEnabled = false
@@ -134,26 +148,28 @@ class MainActivity : AppCompatActivity() {
         binding.split.isEnabled = false
     }
 
+    // Handles a bust from the player/split
     fun handleBust() {
         val playerScore = viewModel.getPlayerHandValue()
         val splitScore = viewModel.getSplitHandValue()
 
         if (playerScore > 21) {
+            // Player hand busted
             Toast.makeText(this, "Player busts!", Toast.LENGTH_SHORT).show()
             viewModel.showDealerHand()
             viewModel.lose()
         } else if (splitScore > 21) {
+            // Split hand busted, so switch to the player hand
             Toast.makeText(this, "Split busted, going back to player hand", Toast.LENGTH_SHORT)
                 .show()
             viewModel.switchToPlayerHand()
-            return
-        } else {
             return
         }
 
         endGame()
     }
 
+    // Handles a stand from the player/split
     fun handleStand() {
         val hitme = binding.hitme
         val stand = binding.stand
@@ -161,8 +177,8 @@ class MainActivity : AppCompatActivity() {
         hitme.isEnabled = false
         stand.isEnabled = false
 
-        // Check if player has split hand
         if (viewModel.isSplitHandActive()) {
+            // Player standed with hand, switch to player hand
             viewModel.switchToPlayerHand()
             Toast.makeText(this, "Switching to player hand", Toast.LENGTH_SHORT).show()
             hitme.isEnabled = true
@@ -170,8 +186,10 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
+        // Reveal the dealer's card
         viewModel.showDealerHand()
         if (viewModel.getDealerHandValue() < 17) {
+            // Get cards until the dealer has 17 or more
             viewModel.getCard().observe(this) { card ->
                 viewModel.addCardToDealerHand(card)
                 statsViewModel.decrease(card)
@@ -182,7 +200,7 @@ class MainActivity : AppCompatActivity() {
             val dealerScore = viewModel.getDealerHandValue()
             val splitScore = viewModel.getSplitHandValue()
 
-            // Player hand
+            // Verify if the player won
             if (playerScore > dealerScore || dealerScore > 21) {
                 Toast.makeText(this, "Player wins!", Toast.LENGTH_SHORT).show()
                 viewModel.win()
@@ -193,7 +211,7 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, "It's a tie!", Toast.LENGTH_SHORT).show()
             }
 
-            // Split hand
+            // Verify if the split won
             if (splitScore != 0 && splitScore <= 21) {
                 if (splitScore > dealerScore || dealerScore > 21) {
                     Toast.makeText(this, "Player wins!", Toast.LENGTH_SHORT).show()
@@ -210,20 +228,25 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // Ask the player for a bet
     fun askBet() {
         val dialog = BetDialog.newInstance();
         dialog.show(supportFragmentManager, "BetDialog")
     }
 
+    // When we receive the bet, start the game
     fun onBet(bet: Int) {
         val playerMoney = viewModel.getMoney().value
-        if (bet == 0) {
+        if (bet <= 0) {
+            // Make sure the player bets something
             Toast.makeText(this, "You must bet something!", Toast.LENGTH_SHORT).show()
         } else if (playerMoney != null) {
             if (playerMoney < bet) {
+                // Can't bet too much
                 Toast.makeText(this, "You don't have enough money!", Toast.LENGTH_SHORT).show()
                 askBet()
             } else {
+                // Start the game
                 viewModel.setBet(bet)
                 startGame()
             }
@@ -237,13 +260,16 @@ class MainActivity : AppCompatActivity() {
         viewModel.getCard().observe(this) { card ->
             viewModel.addCardToPlayerHand(card)
             statsViewModel.decrease(card)
+
             viewModel.getCard().observe(this@MainActivity) { dealerCard ->
                 dealerCard.hidden = true
                 viewModel.addCardToDealerHand(dealerCard)
                 statsViewModel.decrease(dealerCard)
+
                 viewModel.getCard().observe(this@MainActivity) { card2 ->
                     viewModel.addCardToPlayerHand(card2)
                     statsViewModel.decrease(card2)
+
                     viewModel.getCard().observe(this@MainActivity) { dealerCard2 ->
                         viewModel.addCardToDealerHand(dealerCard2)
                         statsViewModel.decrease(dealerCard2)
@@ -251,6 +277,7 @@ class MainActivity : AppCompatActivity() {
                         val playerScore = viewModel.getPlayerHandValue()
                         val dealerScore = viewModel.getDealerHandValue()
 
+                        // Check for blackjack
                         handleBlackjack(playerScore, dealerScore)
 
                         // Check for split
@@ -258,53 +285,60 @@ class MainActivity : AppCompatActivity() {
                             binding.split.isEnabled = true
                         }
 
-                        val hitme = binding.hitme
-                        val stand = binding.stand
-
-                        hitme.isEnabled = true
-                        stand.isEnabled = true
+                        // Enable the buttons
+                        binding.hitme.isEnabled = true
+                        binding.stand.isEnabled = true
+                        binding.reset.isEnabled = false
                     }
                 }
             }
         }
     }
 
+    // Deal with blackjack
     fun handleBlackjack(player: Int, dealer: Int) {
         if (player != 21 && dealer != 21) {
+            // No blackjack
             return
         } else if (player == 21 && dealer == 21) {
+            // Both have blackjack
             Toast.makeText(this, "It's a tie!", Toast.LENGTH_SHORT).show()
         } else if (player == 21) {
+            // Player has blackjack
             Toast.makeText(this, "Player blackjack!", Toast.LENGTH_SHORT).show()
             viewModel.win()
         } else {
+            // Dealer has blackjack
             Toast.makeText(this, "Dealer blackjack!", Toast.LENGTH_SHORT).show()
             viewModel.lose()
         }
 
+        // Reveal the dealer's card
         viewModel.showDealerHand()
         endGame()
     }
 
     fun endGame() {
+        // Update the score and disable buttons
         val playerScore = binding.playerScore
         val dealerScore = binding.dealerScore
         playerScore.text = "Player: ${viewModel.getPlayerHandValue()}"
         dealerScore.text = "Dealer: ${viewModel.getDealerHandValue()}"
 
-        val hitme = binding.hitme
-        val stand = binding.stand
-
-        hitme.isEnabled = false
-        stand.isEnabled = false
+        binding.hitme.isEnabled = false
+        binding.stand.isEnabled = false
+        binding.reset.isEnabled = true
     }
 
+    // Display cards
     fun displayCard(card: Card): ImageView {
         val image = ImageView(this)
 
         if (card.hidden) {
+            // Don't display if it's hidden
             image.setImageResource(R.drawable.card_back)
         } else {
+            // Find the card and display it
             val imageName = card.suit.lowercase() + "_" + card.rank.lowercase()
             val id = resources.getIdentifier(imageName, "drawable", packageName)
             image.setImageResource(id)

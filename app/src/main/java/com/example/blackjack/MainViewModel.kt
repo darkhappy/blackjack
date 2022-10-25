@@ -76,12 +76,15 @@ class MainViewModel : ViewModel() {
         var value = 0
         hand.forEach { card ->
             value += when (card.rank) {
+                // Assume Ace is 11 for now
                 "As" -> 11
+                // Face cards are 10
                 "Roi", "Reine", "Valet" -> 10
                 else -> card.rank.toInt()
             }
         }
 
+        // If the hand is over 21, check if there is an Ace and change its value to 1
         hand.forEach { card ->
             if (card.rank == "As" && value > 21) {
                 value -= 10
@@ -98,6 +101,7 @@ class MainViewModel : ViewModel() {
     }
 
     fun split() {
+        // Create a new hand by removing the first card from the player's hand
         val newSplitHand = mutableListOf<Card>()
         newSplitHand.add(playerHand.value!!.last())
         playerHand.value = playerHand.value!!.dropLast(1)
@@ -126,19 +130,17 @@ class MainViewModel : ViewModel() {
     }
 
     fun win() {
+        // Add the bet money
         money.value = money.value?.plus(bet)
     }
 
     fun lose() {
+        // Remove the bet money
         money.value = money.value?.minus(bet)
     }
 
     fun getBet() : Int {
         return bet
-    }
-
-    fun resetBet() {
-        bet = 0
     }
 
     fun switchToPlayerHand() {

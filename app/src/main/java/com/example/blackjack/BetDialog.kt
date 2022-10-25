@@ -27,6 +27,7 @@ class BetDialog : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Show the money that the player has
         viewModel.getMoney().observe(this) {
             view.findViewById<TextView>(R.id.bet_dialog_balance).text = "Balance: $it"
         }

@@ -26,14 +26,11 @@ class StatsViewModel(application: Application) : AndroidViewModel(application) {
         statsDAO.insert(CardStat("7", 28))
         statsDAO.insert(CardStat("8", 28))
         statsDAO.insert(CardStat("9", 28))
-        statsDAO.insert(CardStat("10", 112))
+        statsDAO.insert(CardStat("10", 112)) // 28 * 4 (10, J, Q, K)
     }
 
     fun decrease(card: Card) {
         val name : String = when (card.rank) {
-            "As" -> {
-                "As"
-            }
             "Valet", "Reine", "Roi" -> {
                 "10"
             }
