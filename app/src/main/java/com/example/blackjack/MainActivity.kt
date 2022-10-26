@@ -164,6 +164,9 @@ class MainActivity : AppCompatActivity() {
                 .show()
             viewModel.switchToPlayerHand()
             return
+        } else {
+            // Neither busted, so do nothing
+            return
         }
 
         endGame()

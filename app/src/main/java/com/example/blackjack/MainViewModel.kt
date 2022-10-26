@@ -5,7 +5,7 @@ import kotlinx.coroutines.Dispatchers
 
 class MainViewModel : ViewModel() {
     private val repository: Repository = Repository()
-    private var deckID : Int = -1
+    private var deckID : Int = 0
 
     private var playerHand = MutableLiveData<List<Card>>()
     private var splitHand = MutableLiveData<List<Card>>()
